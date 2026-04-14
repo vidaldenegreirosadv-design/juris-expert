@@ -2,33 +2,16 @@ import React, { useState, useRef, useEffect } from "react";
 import { GoogleGenAI } from "@google/genai";
 import ReactMarkdown from "react-markdown";
 import { 
-  Scale, 
-  Search, 
-  Copy, 
-  Check, 
-  Loader2, 
-  AlertCircle, 
-  BookOpen, 
-  Gavel,
-  History,
-  Send,
-  Paperclip,
-  X,
-  FileText,
-  Image as ImageIcon,
-  Plus,
-  MessageSquare,
-  Trash2,
-  Menu,
-  ExternalLink,
-  Globe
+  Scale, Search, Copy, Check, Loader2, AlertCircle, 
+  Gavel, Send, Paperclip, X, FileText, Image as ImageIcon, 
+  Plus, MessageSquare, Trash2, Menu, ExternalLink 
 } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
-// CONFIGURAÇÃO DA CHAVE: COLE SUA CHAVE ENTRE AS ASPAS ABAIXO
-const MINHA_CHAVE_SECRET = "AIzaSyBvg1L7lXJL0ljD4UC5tvFIDZTlmoiUsDg"; 
+// COLOQUE SUA CHAVE ABAIXO (MANTENHA AS ASPAS)
+const MINHA_CHAVE_SECRET = "COLE_AQUI_SUA_CHAVE_AIza..."; 
 // =========================================================================================
 
 const SYSTEM_INSTRUCTION = `Você é um assistente jurídico brasileiro especializado em pesquisa de jurisprudência atualizada e análise de documentos.
@@ -55,7 +38,7 @@ Siga rigorosamente estas instruções:
    e) **FONTE (URL):** Forneça o endereço (URL) direto e funcional de onde a informação foi extraída. **NUNCA invente ou alucine URLs.**
 
 4. **CONFIABILIDADE E VERIFICAÇÃO:** Para garantir que o usuário possa verificar a veracidade:
-   - Seja extremamente preciso com os números dos processos (formato CNJ: NNNNNNN-NN.YYYY.J.TR.OOOO).
+   - Seja extremamente preciso com os números de processos (formato CNJ: NNNNNNN-NN.YYYY.J.TR.OOOO).
    - Se encontrar o link direto para o PDF do tribunal, forneça-lo.
    - O sistema exibirá automaticamente os links que você utilizou na seção "Fontes Verificadas pelo Google" ao final da mensagem. Certifique-se de que as decisões citadas no texto correspondam a esses links.
 
@@ -121,7 +104,7 @@ interface Message {
 interface AttachedFile {
   name: string;
   type: string;
-  data: string; // base64
+  data: string; 
 }
 
 interface ChatSession {
@@ -273,6 +256,7 @@ export default function App() {
     setError(null);
 
     try {
+      // INSTANCIAÇÃO DIRETA DENTRO DO HANDLER PARA EVITAR UNDEFINED
       const genAI = new GoogleGenAI(MINHA_CHAVE_SECRET);
       
       const safetySettings = [
