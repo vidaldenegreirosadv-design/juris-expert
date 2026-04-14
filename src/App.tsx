@@ -28,7 +28,7 @@ import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
 // CONFIGURAÇÃO DA CHAVE: COLE SUA CHAVE ENTRE AS ASPAS ABAIXO
-const MINHA_CHAVE_SECRET = "COLE_AQUI_SUA_NOVA_CHAVE_AIza..."; 
+const MINHA_CHAVE_SECRET = "AIzaSyBvg1L7lXJL0ljD4UC5tvFIDZTlmoiUsDg"; 
 // =========================================================================================
 
 const SYSTEM_INSTRUCTION = `Você é um assistente jurídico brasileiro especializado em pesquisa de jurisprudência atualizada e análise de documentos.
@@ -273,7 +273,7 @@ export default function App() {
     setError(null);
 
     try {
-      const MINHA_CHAVE_SECRET = "AIzaSyBvg1L7lXJL0ljD4UC5tvFIDZTlmoiUsDg";
+      const genAI = new GoogleGenAI(MINHA_CHAVE_SECRET);
       
       const safetySettings = [
         { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
@@ -682,4 +682,24 @@ export default function App() {
                 />
                 <button
                   type="submit"
-                  disabled={
+                  disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
+                  className={cn(
+                    "absolute right-3 bottom-3 p-2 rounded-xl transition-all",
+                    (input.trim() || attachedFiles.length > 0) && !isLoading
+                      ? "bg-slate-900 text-white hover:bg-slate-800"
+                      : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                  )}
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </form>
+            </div>
+            <p className="text-[10px] text-center text-slate-400 mt-2 font-medium uppercase tracking-widest">
+              Uso exclusivo para profissionais do direito • Verifique sempre as fontes oficiais
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
