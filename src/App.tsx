@@ -233,9 +233,13 @@ export default function App() {
     setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if ((!input.trim() && attachedFiles.length === 0) || isLoading) return;
+
+    // --- LINHA DE DIAGNÓSTICO (VAMOS VER SE A CHAVE EXISTE) ---
+    console.log("DEBUG: Valor da chave detectado:", import.meta.env.VITE_GEMINI_API_KEY);
+    // ---------------------------------------------------------
 
     let sessionId = currentSessionId;
     if (!sessionId) {
