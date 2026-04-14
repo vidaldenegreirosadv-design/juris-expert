@@ -10,7 +10,7 @@ import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
-// COLOQUE SUA CHAVE ABAIXO (MANTENHA AS ASPAS)
+// ATENÇÃO: COLE SUA CHAVE ABAIXO DENTRO DAS ASPAS
 const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
 // =========================================================================================
 
@@ -38,7 +38,7 @@ Siga rigorosamente estas instruções:
    e) **FONTE (URL):** Forneça o endereço (URL) direto e funcional de onde a informação foi extraída. **NUNCA invente ou alucine URLs.**
 
 4. **CONFIABILIDADE E VERIFICAÇÃO:** Para garantir que o usuário possa verificar a veracidade:
-   - Seja extremamente preciso com os números de processos (formato CNJ: NNNNNNN-NN.YYYY.J.TR.OOOO).
+   - Seja extremamente preciso com os números dos processos (formato CNJ: NNNNNNN-NN.YYYY.J.TR.OOOO).
    - Se encontrar o link direto para o PDF do tribunal, forneça-lo.
    - O sistema exibirá automaticamente os links que você utilizou na seção "Fontes Verificadas pelo Google" ao final da mensagem. Certifique-se de que as decisões citadas no texto correspondam a esses links.
 
@@ -256,8 +256,8 @@ export default function App() {
     setError(null);
 
     try {
-      // INSTANCIAÇÃO DIRETA DENTRO DO HANDLER PARA EVITAR UNDEFINED
-      const genAI = new GoogleGenAI(MINHA_CHAVE_SECRET);
+      // CORREÇÃO DEFINITIVA: Passando a chave dentro de um OBJETO { apiKey: ... }
+      const genAI = new GoogleGenAI({ apiKey: MINHA_CHAVE_SECRET });
       
       const safetySettings = [
         { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
