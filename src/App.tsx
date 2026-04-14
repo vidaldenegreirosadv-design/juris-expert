@@ -10,7 +10,7 @@ import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
-// ATENÇÃO: COLE SUA CHAVE ABAIXO DENTRO DAS ASPAS
+// COLOQUE SUA CHAVE ABAIXO DENTRO DAS ASPAS
 const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
 // =========================================================================================
 
@@ -225,6 +225,12 @@ export default function App() {
     e.preventDefault();
     if ((!input.trim() && attachedFiles.length === 0) || isLoading) return;
 
+    // SINALIZADOR DE VIDA: Para sabermos que a chave foi lida
+    if (MINHA_CHAVE_SECRET.includes("COLE_AQUI")) {
+      alert("ERRO: Você esqueceu de colocar a chave do AI Studio no código!");
+      return;
+    }
+
     let sessionId = currentSessionId;
     if (!sessionId) {
       const newSession: ChatSession = {
@@ -256,8 +262,8 @@ export default function App() {
     setError(null);
 
     try {
-      // CORREÇÃO DEFINITIVA: Passando a chave dentro de um OBJETO { apiKey: ... }
-      const genAI = new GoogleGenAI({ apiKey: MINHA_CHAVE_SECRET });
+      // CORREÇÃO FINAL: Passando a chave como STRING direta, sem objeto { apiKey: ... }
+      const genAI = new GoogleGenAI(MINHA_CHAVE_SECRET);
       
       const safetySettings = [
         { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
