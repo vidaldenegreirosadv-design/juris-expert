@@ -9,7 +9,7 @@ import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
-// COLE SUA CHAVE ABAIXO
+// COLOQUE SUA CHAVE ABAIXO
 const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
 // =========================================================================================
 
@@ -133,8 +133,8 @@ export default function App() {
     setError(null);
 
     try {
-      // VOLTANDO PARA v1beta (Onde a busca do Google funciona) e usando o modelo FLASH (Estável)
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${MINHA_CHAVE_SECRET}`;
+      // ATUALIZADO PARA MODELO 2.0 FLASH EXPERIMENTAL (A versão mais recente)
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${MINHA_CHAVE_SECRET}`;
 
       const contents = updatedMessages.map(m => {
         const parts: any[] = [];
@@ -148,8 +148,8 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents,
-          system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] }, // Correto para v1beta
-          tools: [{ google_search_retrieval: {} }], // Correto para v1beta
+          system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+          tools: [{ google_search_retrieval: {} }],
           safetySettings: [
             { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
             { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
@@ -257,7 +257,7 @@ export default function App() {
               <button onClick={() => fileInputRef.current?.click()} className="p-3 bg-slate-100 text-slate-600 rounded-2xl hover:bg-slate-200 shrink-0 mb-1"><Paperclip className="w-5 h-5" /></button>
               <form onSubmit={handleSubmit} className="relative flex-1">
                 <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }} placeholder="Descreva o caso..." className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 pr-16 focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none min-h-[60px]" rows={1} />
-                <button type="submit" disabled={(!input.trim() && attachedFiles.length === 0) || isLoading} className={cn("absolute right-3 bottom-3 p-2 rounded-xl transition-all", (input.trim() || attachedFiles.length > 0) && !isLoading ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-400")}><Send className="w-5 h-5" /></button>
+                <button type="submit" disabled={(!input.trim() && attachedFiles.length === 0) || isLoading} className={cn("absolute right-3 bottom-3 p-2 rounded-xl transition-all", (input.trim() || attachedFiles.length > 0) && !isLoading ? "bg-slate-900 text-white hover:bg-slate-800" : "bg-slate-100 text-slate-400")}><Send className="w-5 h-5" /></button>
               </form>
             </div>
             <p className="text-[10px] text-center text-slate-400 mt-2 uppercase tracking-widest">Uso exclusivo para profissionais do direito</p>
