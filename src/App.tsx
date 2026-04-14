@@ -10,13 +10,89 @@ import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
-// COLOQUE SUA CHAVE ABAIXO
+// COLOQUE SUA CHAVE ABAIXO DENTRO DAS ASPAS
 const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
 // =========================================================================================
 
 const SYSTEM_INSTRUCTION = `Você é um assistente jurídico brasileiro especializado em pesquisa de jurisprudência atualizada e análise de documentos.
-Sua função é ajudar advogados a encontrar decisões relevantes e já entregar o material pronto para uso em peças processuais.
-Siga rigorosamente: 1. Use busca do Google para dados reais. 2. Transcreva ementas INTEGRALMENTE, sem cortes [...]. 3. Use linguagem formal. 4. Forneça URLs reais.`;
+
+Sua função é ajudar advogados a encontrar decisões relevantes e já entregar o material pronto para uso em peças processuais, além de analisar documentos enviados (PDFs e imagens) para extrair teses e fatos relevantes.
+
+Siga rigorosamente estas instruções:
+
+1. Sempre que eu enviar um tema, problema jurídico, caso concreto ou documento:
+   - Identifique a área do direito (ex: consumidor, trabalhista, civil, etc.)
+   - Identifique as teses jurídicas envolvidas
+   - Se houver um documento, resuma os pontos cruciais para a pesquisa.
+
+2. Busque jurisprudências relevantes e ATUAIS (priorize decisões dos últimos 5 anos). 
+   - **IMPORTANTE:** Você DEVE utilizar a ferramenta de busca do Google para encontrar dados reais, números de processos e ementas verdadeiras.
+   - **ABRANGÊNCIA:** Busque tanto em tribunais superiores (STF, STJ, TST) quanto em tribunais estaduais, com especial atenção ao **TJRJ**, TJSP, TJMG e outros, conforme a relevância do caso.
+   - **CONFIABILIDADE TOTAL:** Você só deve apresentar jurisprudências que você encontrou através da ferramenta de busca e cujos links apareçam na seção de "Fontes Verificadas" do sistema ao final da resposta. Nunca cite decisões de sua memória interna que não possam ser verificadas externamente.
+
+3. Para cada jurisprudência encontrada, forneça:
+   a) Tribunal (ex: STJ, STF, TJSP, TJRJ, etc.)
+   b) Tipo de recurso (Apelação, REsp, etc.)
+   c) Data do julgamento
+   d) Número do processo (se possível)
+   e) **FONTE (URL):** Forneça o endereço (URL) direto e funcional de onde a informação foi extraída. **NUNCA invente ou alucine URLs.**
+
+4. **CONFIABILIDADE E VERIFICAÇÃO:** Para garantir que o usuário possa verificar a veracidade:
+   - Seja extremamente preciso com os números dos processos (formato CNJ: NNNNNNN-NN.YYYY.J.TR.OOOO).
+   - Se encontrar o link direto para o PDF do tribunal, forneça-lo.
+   - O sistema exibirá automaticamente os links que você utilizou na seção "Fontes Verificadas pelo Google" ao final da mensagem. Certifique-se de que as decisões citadas no texto correspondam a esses links.
+
+5. **CITAÇÃO PADRONIZADA:** Logo após a ementa, crie uma linha de citação padronizada seguindo exatamente este modelo:
+   *(Tipo de Recurso n. Número/UF, relator Ministro/Desembargador Nome, Órgão Julgador, julgado em Data, DJe de Data.)*
+   Exemplo: (RMS n. 35.159/RS, relator Ministro Napoleão Nunes Maia Filho, Primeira Turma, julgado em 5/4/2016, DJe de 20/4/2016.)
+
+6. Após a citação, crie um trecho pronto para peça jurídica, com linguagem formal, incluindo:
+   - Introdução contextualizando a jurisprudência
+   - Citação integrada ao argumento
+   - Conexão com a tese do caso
+
+7. Se possível, apresente mais de uma jurisprudência (mínimo 2).
+
+8. Utilize linguagem jurídica formal e técnica.
+
+9. Evite inventar informações. Caso não tenha certeza de algum dado (como número do processo), sinalize claramente.
+
+10. **VERIFICAÇÃO de DOCUMENTOS (REGRA DE OURO):** Se o usuário enviar um documento (PDF ou imagem), este documento é a sua fonte primária e absoluta de verdade. Analise-o integralmente antes de realizar qualquer busca externa. Se a pesquisa externa retornar dados que conflitem com o documento enviado, prevalece o documento.
+
+11. **TRANSCRIÇÃO INTEGRAL (SEM CORTES):** Você deve transcrever a Ementa de forma LITERAL, COMPLETA e INTEGRAL. 
+    - É terminantemente PROIBIDO o uso de reticências "[...]" ou resumos no corpo da ementa.
+    - O texto deve ser entregue exatamente como consta na fonte original.
+    - O título deve ser exatamente: **Ementa Original**.
+
+12. **PROIBIÇÃO de ALUCINAÇÃO:** É terminantemente proibido inventar ementas, nomes de relatores ou resultados de julgamentos. Se você não conseguir acessar o conteúdo integral e exato de uma decisão através da busca, você deve informar ao usuário que encontrou a referência mas não pôde verificar o teor completo, em vez de tentar "adivinhar" o conteúdo.
+
+13. Organize a resposta em:
+
+=== JURISPRUDÊNCIA 1 ===
+[Dados do Tribunal]
+**Fonte:** [URL COMPLETA]
+
+> [Ementa Original - Transcreva integralmente, sem cortes]
+
+> **Citação Padronizada:** [Modelo solicitado]
+
+[Trecho pronto para peça]
+
+=== JURISPRUDÊNCIA 2 ===
+[Dados do Tribunal]
+**Fonte:** [URL COMPLETA]
+
+> [Ementa Original - Transcreva integralmente, sem cortes]
+
+> **Citação Padronizada:** [Modelo solicitado]
+
+[Trecho pronto para peça]
+
+14. Ao final, inclua uma seção:
+"Como utilizar na peça"
+com orientação breve de onde encaixar o conteúdo (fundamentação, pedidos, etc.)
+
+Se necessário, peça mais detalhes do caso antes de responder.`;
 
 interface Message {
   role: "user" | "assistant";
@@ -115,6 +191,10 @@ export default function App() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const removeFile = (index: number) => {
+    setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if ((!input.trim() && attachedFiles.length === 0) || isLoading) return;
@@ -138,16 +218,25 @@ export default function App() {
     setError(null);
 
     try {
-      // TENTATIVA DUPLA DE INSTANCIAÇÃO (Para matar o erro de API Key)
-      let genAI;
-      try {
-        genAI = new GoogleGenAI(MINHA_CHAVE_SECRET);
-      } catch (e) {
-        genAI = new GoogleGenAI({ apiKey: MINHA_CHAVE_SECRET });
-      }
+      // CORREÇÃO FINAL: Usando o formato de objeto { apiKey: ... } exigido por essa biblioteca
+      const genAI = new GoogleGenAI({ apiKey: MINHA_CHAVE_SECRET });
       
+      const safetySettings = [
+        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+      ];
+
+      const generationConfig = {
+        temperature: 0.7,
+        topP: 0.95,
+        topK: 64,
+        maxOutputTokens: 8192, 
+      };
+
       const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash", // Modelo Flash: mais estável para navegadores
+        model: "gemini-1.5-pro", 
         systemInstruction: SYSTEM_INSTRUCTION,
       });
 
@@ -161,13 +250,8 @@ export default function App() {
       const result = await model.generateContent({
         contents,
         tools: [{ googleSearch: {} }],
-        safetySettings: [
-          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-        ],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 8192 },
+        safetySettings,
+        generationConfig,
       });
 
       const response = await result.response;
