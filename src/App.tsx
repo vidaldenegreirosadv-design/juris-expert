@@ -26,6 +26,11 @@ import {
 import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
+// =========================================================================================
+// CONFIGURAÇÃO DA CHAVE: COLE SUA CHAVE ENTRE AS ASPAS ABAIXO
+const MINHA_CHAVE_SECRET = "COLE_AQUI_SUA_NOVA_CHAVE_AIza..."; 
+// =========================================================================================
+
 const SYSTEM_INSTRUCTION = `Você é um assistente jurídico brasileiro especializado em pesquisa de jurisprudência atualizada e análise de documentos.
 
 Sua função é ajudar advogados a encontrar decisões relevantes e já entregar o material pronto para uso em peças processuais, além de analisar documentos enviados (PDFs e imagens) para extrair teses e fatos relevantes.
@@ -51,7 +56,7 @@ Siga rigorosamente estas instruções:
 
 4. **CONFIABILIDADE E VERIFICAÇÃO:** Para garantir que o usuário possa verificar a veracidade:
    - Seja extremamente preciso com os números dos processos (formato CNJ: NNNNNNN-NN.YYYY.J.TR.OOOO).
-   - Se encontrar o link direto para o PDF do tribunal, forneça-o.
+   - Se encontrar o link direto para o PDF do tribunal, forneça-lo.
    - O sistema exibirá automaticamente os links que você utilizou na seção "Fontes Verificadas pelo Google" ao final da mensagem. Certifique-se de que as decisões citadas no texto correspondam a esses links.
 
 5. **CITAÇÃO PADRONIZADA:** Logo após a ementa, crie uma linha de citação padronizada seguindo exatamente este modelo:
@@ -233,13 +238,9 @@ export default function App() {
     setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if ((!input.trim() && attachedFiles.length === 0) || isLoading) return;
-
-    // --- LINHA DE DIAGNÓSTICO (VAMOS VER SE A CHAVE EXISTE) ---
-    console.log("DEBUG: Valor da chave detectado:", import.meta.env.VITE_GEMINI_API_KEY);
-    // ---------------------------------------------------------
 
     let sessionId = currentSessionId;
     if (!sessionId) {
@@ -272,9 +273,8 @@ const handleSubmit = async (e: React.FormEvent) => {
     setError(null);
 
     try {
-     const genAI = new GoogleGenAI(import.meta.env.VITE_GEMINI_API_KEY || "");
+      const MINHA_CHAVE_SECRET = "AIzaSyBvg1L7lXJL0ljD4UC5tvFIDZTlmoiUsDg";
       
-      // CONFIGURAÇÃO DE SEGURANÇA TOTAL (Para evitar erros de Copyright/Recitation)
       const safetySettings = [
         { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
         { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
@@ -282,12 +282,11 @@ const handleSubmit = async (e: React.FormEvent) => {
         { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
       ];
 
-      // CONFIGURAÇÃO DE GERAÇÃO (Para evitar cortes no texto)
       const generationConfig = {
         temperature: 0.7,
         topP: 0.95,
         topK: 64,
-        maxOutputTokens: 8192, // Valor máximo para ementas longas
+        maxOutputTokens: 8192, 
       };
 
       const model = genAI.getGenerativeModel({ 
@@ -329,7 +328,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         if (candidate?.finishReason === "SAFETY") {
           throw new Error("A resposta foi bloqueada pelos filtros de segurança.");
         } else if (candidate?.finishReason === "RECITATION") {
-          throw new Error("A resposta foi bloqueada por conter material protegido por direitos autorais. Tente reformular a busca.");
+          throw new Error("A resposta foi bloqueada por conter material protegido por direitos autorais.");
         }
         throw new Error("O modelo não retornou conteúdo textual.");
       }
@@ -350,8 +349,6 @@ const handleSubmit = async (e: React.FormEvent) => {
       
       if (err.message?.includes("API key")) {
         errorMessage = "Erro de autenticação: Verifique a chave de API.";
-      } else if (err.message?.includes("safety")) {
-        errorMessage = "A solicitação foi bloqueada pelos filtros de segurança.";
       }
       
       setError(errorMessage);
@@ -362,7 +359,6 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   return (
     <div className="flex h-screen bg-[#f8fafc] text-slate-900 font-sans overflow-hidden">
-      {/* Sidebar */}
       <AnimatePresence mode="wait">
         {isSidebarOpen && (
           <motion.aside
@@ -435,9 +431,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         )}
       </AnimatePresence>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col relative overflow-hidden">
-        {/* Header */}
         <header className="bg-white border-b border-slate-200 h-16 shrink-0 flex items-center px-4 justify-between sticky top-0 z-10">
           <div className="flex items-center gap-3">
             {!isSidebarOpen && (
@@ -454,7 +448,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               </div>
               <div>
                 <h1 className="text-sm font-bold tracking-tight text-slate-900">
-                  JurisExpert
+                  JURIS-TESTE
                 </h1>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                   Assistente Jurídico
@@ -471,7 +465,6 @@ const handleSubmit = async (e: React.FormEvent) => {
           </div>
         </header>
 
-        {/* Chat Area */}
         <main className="flex-1 overflow-y-auto bg-[#f8fafc] relative">
           <div className="max-w-4xl mx-auto px-4 py-8 pb-48">
             {messages.length === 0 && !isLoading && (
@@ -569,7 +562,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                       </div>
                       {msg.role === "assistant" && (
                         <div className="mt-4 pt-4 border-t border-slate-100 space-y-4">
-                          {/* Grounding Sources */}
                           {msg.sources && msg.sources.length > 0 && (
                             <div className="space-y-2">
                               <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
@@ -643,7 +635,6 @@ const handleSubmit = async (e: React.FormEvent) => {
           </div>
         </main>
 
-        {/* Input Area */}
         <div className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-slate-200 p-4 z-10">
           <div className="max-w-4xl mx-auto">
             {attachedFiles.length > 0 && (
@@ -691,24 +682,4 @@ const handleSubmit = async (e: React.FormEvent) => {
                 />
                 <button
                   type="submit"
-                  disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
-                  className={cn(
-                    "absolute right-3 bottom-3 p-2 rounded-xl transition-all",
-                    (input.trim() || attachedFiles.length > 0) && !isLoading
-                      ? "bg-slate-900 text-white hover:bg-slate-800"
-                      : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                  )}
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </form>
-            </div>
-            <p className="text-[10px] text-center text-slate-400 mt-2 font-medium uppercase tracking-widest">
-              Uso exclusivo para profissionais do direito • Verifique sempre as fontes oficiais
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+                  disabled={
