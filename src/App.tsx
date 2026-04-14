@@ -9,7 +9,7 @@ import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
-// COLE SUA CHAVE AQUI
+// COLOQUE SUA CHAVE ABAIXO
 const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
 // =========================================================================================
 
@@ -133,8 +133,8 @@ export default function App() {
     setError(null);
 
     try {
-      // CHAMADA DIRETA VIA REST API (Ignora qualquer biblioteca com erro)
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${MINHA_CHAVE_SECRET}`;
+      // USANDO O MODELO FLASH (O mais estável e compatível de todos)
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${MINHA_CHAVE_SECRET}`;
 
       const contents = updatedMessages.map(m => {
         const parts: any[] = [];
@@ -161,10 +161,7 @@ export default function App() {
       });
 
       const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error.message || "Erro na API do Google");
-      }
+      if (data.error) throw new Error(data.error.message || "Erro na API do Google");
 
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("O modelo não retornou texto. Tente reformular.");
