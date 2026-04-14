@@ -268,7 +268,7 @@ export default function App() {
     setError(null);
 
     try {
-     const genAI = new GoogleGenAI("AIzaSyClq2YOTXKvZYIAe4pCO030Fe3c1l2aFII");
+     const genAI = new GoogleGenAI(import.meta.env.VITE_GEMINI_API_KEY || "");
       
       // CONFIGURAÇÃO DE SEGURANÇA TOTAL (Para evitar erros de Copyright/Recitation)
       const safetySettings = [
