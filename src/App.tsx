@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
 // COLOQUE SUA CHAVE ABAIXO (MANTENHA AS ASPAS)
-const MINHA_CHAVE_SECRET = "COLE_AQUI_SUA_CHAVE_AIza..."; 
+const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
 // =========================================================================================
 
 const SYSTEM_INSTRUCTION = `Você é um assistente jurídico brasileiro especializado em pesquisa de jurisprudência atualizada e análise de documentos.
