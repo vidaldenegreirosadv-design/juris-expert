@@ -9,7 +9,7 @@ import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
-// COLE SUA CHAVE AQUI
+// COLE SUA CHAVE ABAIXO
 const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
 // =========================================================================================
 
@@ -133,8 +133,8 @@ export default function App() {
     setError(null);
 
     try {
-      // ATUALIZADO: Agora usando versão v1 (estável) e modelo Flash (universal)
-      const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${MINHA_CHAVE_SECRET}`;
+      // VOLTANDO PARA v1beta (Onde a busca do Google funciona) e usando o modelo FLASH (Estável)
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${MINHA_CHAVE_SECRET}`;
 
       const contents = updatedMessages.map(m => {
         const parts: any[] = [];
@@ -148,8 +148,8 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents,
-          system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
-          tools: [{ google_search_retrieval: {} }],
+          system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] }, // Correto para v1beta
+          tools: [{ google_search_retrieval: {} }], // Correto para v1beta
           safetySettings: [
             { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
             { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
