@@ -9,7 +9,7 @@ import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
-// COLOQUE SUA CHAVE ABAIXO
+// COLE SUA CHAVE AQUI
 const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
 // =========================================================================================
 
@@ -133,8 +133,8 @@ export default function App() {
     setError(null);
 
     try {
-      // USANDO O MODELO FLASH (O mais estável e compatível de todos)
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${MINHA_CHAVE_SECRET}`;
+      // ATUALIZADO: Agora usando versão v1 (estável) e modelo Flash (universal)
+      const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${MINHA_CHAVE_SECRET}`;
 
       const contents = updatedMessages.map(m => {
         const parts: any[] = [];
