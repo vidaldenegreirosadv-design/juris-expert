@@ -8,15 +8,6 @@ import {
 import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
-// =========================================================================================
-// COLOQUE SUA CHAVE ABAIXO
-const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
-// =========================================================================================
-
-const SYSTEM_INSTRUCTION = `Você é um assistente jurídico brasileiro especializado em pesquisa de jurisprudência atualizada e análise de documentos.
-Sua função é ajudar advogados a encontrar decisões relevantes e já entregar o material pronto para uso em peças processuais.
-Siga rigorosamente: 1. Use busca do Google para dados reais. 2. Transcreva ementas INTEGRALMENTE, sem cortes [...]. 3. Use linguagem formal. 4. Forneça URLs reais.`;
-
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -110,6 +101,10 @@ export default function App() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const removeFile = (index: number) => {
+    setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if ((!input.trim() && attachedFiles.length === 0) || isLoading) return;
@@ -133,8 +128,8 @@ export default function App() {
     setError(null);
 
     try {
-      // ATUALIZADO PARA MODELO 2.0 FLASH EXPERIMENTAL (A versão mais recente)
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${MINHA_CHAVE_SECRET}`;
+      // O "PULO DO GATO": Agora chamamos nossa própria API na Vercel, não mais o Google direto!
+      const API_URL = '/api/search';
 
       const contents = updatedMessages.map(m => {
         const parts: any[] = [];
@@ -146,25 +141,14 @@ export default function App() {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents,
-          system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
-          tools: [{ google_search_retrieval: {} }],
-          safetySettings: [
-            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-          ],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 8192 },
-        })
+        body: JSON.stringify({ messages: contents }),
       });
 
       const data = await response.json();
-      if (data.error) throw new Error(data.error.message || "Erro na API do Google");
+      if (data.error) throw new Error(data.error);
 
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error("O modelo não retornou texto. Tente reformular.");
+      if (!text) throw new Error("O modelo não retornou texto.");
 
       const sources = data.candidates?.[0]?.groundingMetadata?.groundingChunks
         ?.map((chunk: any) => chunk.web)
@@ -174,7 +158,7 @@ export default function App() {
       setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, messages: [...updatedMessages, { role: "assistant", content: text, sources }] } : s));
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Ocorreu um erro ao processar sua solicitação.");
+      setError(err.message || "Erro na conexão com o servidor.");
     } finally {
       setIsLoading(false);
     }
@@ -257,7 +241,7 @@ export default function App() {
               <button onClick={() => fileInputRef.current?.click()} className="p-3 bg-slate-100 text-slate-600 rounded-2xl hover:bg-slate-200 shrink-0 mb-1"><Paperclip className="w-5 h-5" /></button>
               <form onSubmit={handleSubmit} className="relative flex-1">
                 <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }} placeholder="Descreva o caso..." className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 pr-16 focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none min-h-[60px]" rows={1} />
-                <button type="submit" disabled={(!input.trim() && attachedFiles.length === 0) || isLoading} className={cn("absolute right-3 bottom-3 p-2 rounded-xl transition-all", (input.trim() || attachedFiles.length > 0) && !isLoading ? "bg-slate-900 text-white hover:bg-slate-800" : "bg-slate-100 text-slate-400")}><Send className="w-5 h-5" /></button>
+                <button type="submit" disabled={(!input.trim() && attachedFiles.length === 0) || isLoading} className={cn("absolute right-3 bottom-3 p-2 rounded-xl transition-all", (input.trim() || attachedFiles.length > 0) && !isLoading ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-400")}><Send className="w-5 h-5" />}</button>
               </form>
             </div>
             <p className="text-[10px] text-center text-slate-400 mt-2 uppercase tracking-widest">Uso exclusivo para profissionais do direito</p>
