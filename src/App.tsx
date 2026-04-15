@@ -9,14 +9,18 @@ import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
-// CONFIGURAÇÕES DE ACESSO
+// CONFIGURAÇÕES DE ACESSO (USANDO SEU MODELO DE ALTA PERFORMANCE)
 const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
-const MODELO_IA = "gemini-2.0-flash-exp"; // Se der "Not Found", tente: "gemini-1.5-pro" ou "gemini-2.0-flash-exp"
+const MODELO_IA = "gemini-3.1-pro-preview"; // O modelo mais potente da sua lista
 // =========================================================================================
 
-const SYSTEM_INSTRUCTION = `Você é um assistente jurídico brasileiro especializado em pesquisa de jurisprudência atualizada. 
-Sua função é ajudar advogados a encontrar decisões relevantes. 
-Siga rigorosamente: 1. Use busca do Google para dados reais. 2. Transcreva ementas INTEGRALMENTE, sem cortes. 3. Use linguagem formal. 4. Forneça URLs reais.`;
+const SYSTEM_INSTRUCTION = `Você é um assistente jurídico brasileiro de elite, especializado em pesquisa de jurisprudência.
+Sua missão é entregar material pronto para uso em peças processuais.
+Siga RIGOROSAMENTE:
+1. USE a ferramenta de busca do Google para encontrar dados reais e atuais.
+2. TRANSCREVA as ementas de forma INTEGRAL e LITERAL. É terminantemente proibido usar reticências [...] ou resumir a ementa.
+3. Mantenha linguagem técnica e formal.
+4. Forneça a URL direta da fonte para cada decisão.`;
 
 interface Message {
   role: "user" | "assistant";
@@ -138,7 +142,7 @@ export default function App() {
     setError(null);
 
     try {
-      // URL dinâmica baseada na variável MODELO_IA
+      // Chamada via v1beta para suporte a Grounding (Busca do Google)
       const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO_IA}:generateContent?key=${MINHA_CHAVE_SECRET}`;
 
       const payload = {
@@ -159,7 +163,7 @@ export default function App() {
           { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
           { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
         ],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 8192 },
+        generationConfig: { temperature: 0.3, maxOutputTokens: 8192 },
       };
 
       const response = await fetch(API_URL, {
