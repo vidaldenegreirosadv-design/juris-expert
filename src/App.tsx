@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
 // CONFIGURAÇÕES DE ACESSO (USANDO SEU MODELO DE ALTA PERFORMANCE)
-const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
+const MINHA_CHAVE_SECRET = "AIzaSyB12Pdt9K9R6vyBJKqz1r8hkSVSbcrNbX8"; 
 const MODELO_IA = "gemini-flash-lite-latest"; // O modelo mais potente da sua lista
 // =========================================================================================
 
