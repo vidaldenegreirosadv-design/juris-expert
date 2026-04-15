@@ -8,6 +8,15 @@ import {
 import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
+// =========================================================================================
+// COLOQUE SUA CHAVE AQUI
+const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
+// =========================================================================================
+
+const SYSTEM_INSTRUCTION = `Você é um assistente jurídico brasileiro especializado em pesquisa de jurisprudência atualizada. 
+Sua função é ajudar advogados a encontrar decisões relevantes. 
+Siga rigorosamente: 1. Use busca do Google para dados reais. 2. Transcreva ementas INTEGRALMENTE, sem cortes. 3. Use linguagem formal. 4. Forneça URLs reais.`;
+
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -128,18 +137,42 @@ export default function App() {
     setError(null);
 
     try {
-      // CHAMADA PARA O BACKEND DA VERCEL
-      const response = await fetch('/api/search', {
+      // CHAMADA DIRETA VIA REST (Sintaxe ultra-simplificada para evitar erros de payload)
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${MINHA_CHAVE_SECRET}`;
+
+      // Montando o corpo da requisição exatamente como o Google exige
+      const payload = {
+        contents: updatedMessages.map((m: any) => ({
+          role: m.role === "assistant" ? "model" : "user",
+          parts: [
+            ...(m.content ? [{ text: m.content }] : []),
+            ...(m.files ? m.files.map((f: any) => ({ inlineData: { data: f.data, mimeType: f.type } })) : [])
+          ]
+        })),
+        system_instruction: {
+          parts: [{ text: SYSTEM_INSTRUCTION }]
+        },
+        tools: [{ google_search_retrieval: {} }],
+        safetySettings: [
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+        ],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 8192 },
+      };
+
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updatedMessages }),
+        body: JSON.stringify(payload)
       });
 
       const data = await response.json();
-      if (data.error) throw new Error(data.error);
+      if (data.error) throw new Error(data.error.message || "Erro na API do Google");
 
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error("O modelo não retornou conteúdo textual.");
+      if (!text) throw new Error("O modelo não retornou texto.");
 
       const sources = data.candidates?.[0]?.groundingMetadata?.groundingChunks
         ?.map((chunk: any) => chunk.web)
@@ -148,7 +181,7 @@ export default function App() {
 
       setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, messages: [...updatedMessages, { role: "assistant", content: text, sources }] } : s));
     } catch (err: any) {
-      setError(err.message || "Erro ao conectar com o servidor de pesquisa.");
+      setError(err.message || "Erro ao processar a solicitação.");
     } finally {
       setIsLoading(false);
     }
