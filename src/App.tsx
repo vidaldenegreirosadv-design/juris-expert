@@ -4,13 +4,9 @@ import {
   Scale, Search, Copy, Check, Loader2, AlertCircle, 
   Gavel, Send, Paperclip, X, FileText, Image as ImageIcon, 
   Plus, MessageSquare, Trash2, Menu, ExternalLink 
-} from "lucide-// a-react";
+} from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
-
-// Se quiser usar a chave na Vercel, deixe isso vazio: ""
-// Se quiser forçar a chave aqui, coloque entre as aspas.
-const MINHA_CHAVE_BACKUP = ""; 
 
 interface Message {
   role: "user" | "assistant";
@@ -126,12 +122,13 @@ export default function App() {
     setInput(""); setAttachedFiles([]);
 
     const updatedMessages: Message[] = [...messages, { role: "user", content: userMessage, files: currentFiles }];
-    setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, messages: updatedMessages } : s));
+    setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, messages: updatedMessages, title: s.messages.length === 0 ? (userMessage.substring(0, 30) || "Pesquisa") : s.title } : s));
 
     setIsLoading(true);
     setError(null);
 
     try {
+      // CHAMADA PARA O BACKEND DA VERCEL
       const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -142,7 +139,7 @@ export default function App() {
       if (data.error) throw new Error(data.error);
 
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error("O modelo não retornou texto.");
+      if (!text) throw new Error("O modelo não retornou conteúdo textual.");
 
       const sources = data.candidates?.[0]?.groundingMetadata?.groundingChunks
         ?.map((chunk: any) => chunk.web)
@@ -151,7 +148,7 @@ export default function App() {
 
       setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, messages: [...updatedMessages, { role: "assistant", content: text, sources }] } : s));
     } catch (err: any) {
-      setError(err.message || "Erro na conexão com o servidor.");
+      setError(err.message || "Erro ao conectar com o servidor de pesquisa.");
     } finally {
       setIsLoading(false);
     }
