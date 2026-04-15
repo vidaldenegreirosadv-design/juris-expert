@@ -9,8 +9,9 @@ import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
-// COLOQUE SUA CHAVE AQUI (USE UMA CHAVE NOVA SE POSSÍVEL)
+// CONFIGURAÇÕES DE ACESSO
 const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
+const MODELO_IA = "gemini-1.5-flash"; // Se der "Not Found", tente: "gemini-1.5-pro" ou "gemini-2.0-flash-exp"
 // =========================================================================================
 
 const SYSTEM_INSTRUCTION = `Você é um assistente jurídico brasileiro especializado em pesquisa de jurisprudência atualizada. 
@@ -137,8 +138,8 @@ export default function App() {
     setError(null);
 
     try {
-      // MODELO 'LATEST' PARA EVITAR ERRO DE 'NOT FOUND'
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${MINHA_CHAVE_SECRET}`;
+      // URL dinâmica baseada na variável MODELO_IA
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO_IA}:generateContent?key=${MINHA_CHAVE_SECRET}`;
 
       const payload = {
         contents: updatedMessages.map((m: any) => ({
