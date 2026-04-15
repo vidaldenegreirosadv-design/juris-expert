@@ -9,7 +9,7 @@ import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
-// COLOQUE SUA CHAVE AQUI
+// COLOQUE SUA CHAVE AQUI (USE UMA CHAVE NOVA SE POSSÍVEL)
 const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
 // =========================================================================================
 
@@ -137,10 +137,9 @@ export default function App() {
     setError(null);
 
     try {
-      // CHAMADA DIRETA VIA REST (Sintaxe ultra-simplificada para evitar erros de payload)
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${MINHA_CHAVE_SECRET}`;
+      // MODELO 'LATEST' PARA EVITAR ERRO DE 'NOT FOUND'
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${MINHA_CHAVE_SECRET}`;
 
-      // Montando o corpo da requisição exatamente como o Google exige
       const payload = {
         contents: updatedMessages.map((m: any) => ({
           role: m.role === "assistant" ? "model" : "user",
