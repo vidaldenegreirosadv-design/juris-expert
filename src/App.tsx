@@ -4,9 +4,13 @@ import {
   Scale, Search, Copy, Check, Loader2, AlertCircle, 
   Gavel, Send, Paperclip, X, FileText, Image as ImageIcon, 
   Plus, MessageSquare, Trash2, Menu, ExternalLink 
-} from "lucide-react";
+} from "lucide-// a-react";
 import { cn } from "@/src/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
+
+// Se quiser usar a chave na Vercel, deixe isso vazio: ""
+// Se quiser forçar a chave aqui, coloque entre as aspas.
+const MINHA_CHAVE_BACKUP = ""; 
 
 interface Message {
   role: "user" | "assistant";
@@ -128,20 +132,10 @@ export default function App() {
     setError(null);
 
     try {
-      // O "PULO DO GATO": Agora chamamos nossa própria API na Vercel, não mais o Google direto!
-      const API_URL = '/api/search';
-
-      const contents = updatedMessages.map(m => {
-        const parts: any[] = [];
-        if (m.content) parts.push({ text: m.content });
-        if (m.files) m.files.forEach(f => parts.push({ inlineData: { data: f.data, mimeType: f.type } }));
-        return { role: m.role === "user" ? "user" : "model", parts };
-      });
-
-      const response = await fetch(API_URL, {
+      const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: contents }),
+        body: JSON.stringify({ messages: updatedMessages }),
       });
 
       const data = await response.json();
@@ -157,7 +151,6 @@ export default function App() {
 
       setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, messages: [...updatedMessages, { role: "assistant", content: text, sources }] } : s));
     } catch (err: any) {
-      console.error(err);
       setError(err.message || "Erro na conexão com o servidor.");
     } finally {
       setIsLoading(false);
@@ -241,7 +234,7 @@ export default function App() {
               <button onClick={() => fileInputRef.current?.click()} className="p-3 bg-slate-100 text-slate-600 rounded-2xl hover:bg-slate-200 shrink-0 mb-1"><Paperclip className="w-5 h-5" /></button>
               <form onSubmit={handleSubmit} className="relative flex-1">
                 <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }} placeholder="Descreva o caso..." className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 pr-16 focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none min-h-[60px]" rows={1} />
-                <button type="submit" disabled={(!input.trim() && attachedFiles.length === 0) || isLoading} className={cn("absolute right-3 bottom-3 p-2 rounded-xl transition-all", (input.trim() || attachedFiles.length > 0) && !isLoading ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-400")}><Send className="w-5 h-5" />}</button>
+                <button type="submit" disabled={(!input.trim() && attachedFiles.length === 0) || isLoading} className={cn("absolute right-3 bottom-3 p-2 rounded-xl transition-all", (input.trim() || attachedFiles.length > 0) && !isLoading ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-400")}><Send className="w-5 h-5" /></button>
               </form>
             </div>
             <p className="text-[10px] text-center text-slate-400 mt-2 uppercase tracking-widest">Uso exclusivo para profissionais do direito</p>
