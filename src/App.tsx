@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "motion/react";
 // =========================================================================================
 // CONFIGURAÇÕES DE ACESSO
 const MINHA_CHAVE_SECRET = "AIzaSyAzIHw88B8y2pfmStTdiv7gq8B3SJgWl5s"; 
-const MODELO_IA = "gemini-1.5-pro"; // Se der "Not Found", tente: "gemini-1.5-pro" ou "gemini-2.0-flash-exp"
+const MODELO_IA = "gemini-2.0-flash-exp"; // Se der "Not Found", tente: "gemini-1.5-pro" ou "gemini-2.0-flash-exp"
 // =========================================================================================
 
 const SYSTEM_INSTRUCTION = `Você é um assistente jurídico brasileiro especializado em pesquisa de jurisprudência atualizada. 
