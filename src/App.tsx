@@ -10,8 +10,8 @@ import { motion, AnimatePresence } from "motion/react";
 
 // =========================================================================================
 // CONFIGURAÇÕES DE ACESSO (USANDO SEU MODELO DE ALTA PERFORMANCE)
-const MINHA_CHAVE_SECRET = "AIzaSyDNoWrSKkx3qej4Z3B7Vlg_Qg4cavCR84g"; 
-const MODELO_IA = "gemma-4-31b-it"; // O modelo mais potente da sua lista
+const MINHA_CHAVE_SECRET = "AIzaSyA-EA-sCENb0BVQ5wPbZ2bvtFVzUMbCZS4"; 
+const MODELO_IA = "gemini-2.0-flash-lite"; // O modelo mais potente da sua lista
 // =========================================================================================
 
 const SYSTEM_INSTRUCTION = `Você é um assistente jurídico brasileiro de elite, especializado em pesquisa de jurisprudência.
